@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coin Basecamp</title>
+<style>
+body{font-family:Arial;background:#f1f5f9;margin:0}
+.header{background:#fff;padding:16px;border-bottom:1px solid #e2e8f0;font-weight:bold}
+.section{padding:20px}
+.card{background:#fff;padding:14px;margin-bottom:10px;border-radius:8px;border:1px solid #e2e8f0}
+.ticker{display:flex;gap:20px;padding:10px;background:#fff;border-bottom:1px solid #e2e8f0}
+</style>
+</head>
+<body>
+
+<div class="header">COIN BASECAMP</div>
+
+<div class="ticker" id="ticker"></div>
+
+<div class="section">
+<h3>주요 크립토 뉴스</h3>
+<div id="news"></div>
+</div>
+
+<div class="section">
+<h3>중요 알림</h3>
+<div id="alerts"></div>
+</div>
+
+<div class="section">
+<h3>Pre‑TGE Radar</h3>
+<div id="tge"></div>
+</div>
+
+<script src="/js/news.js"></script>
+<script src="/js/alerts.js"></script>
+<script src="/js/ticker.js"></script>
+<script src="/js/tge.js"></script>
+
+<script>
+loadNews()
+loadAlerts()
+loadTicker()
+loadTGE()
+</script>
+
+</body>
+</html>
