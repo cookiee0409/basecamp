@@ -464,6 +464,7 @@ function renderError(msg) {
     <div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">${msg}</div>`;
 }
 
+
 async function loadNews() {
   const btn = document.getElementById('news-refresh-btn');
   btn.disabled = true;
@@ -472,47 +473,14 @@ async function loadNews() {
   document.getElementById('news-list').innerHTML = `
     <div id="news-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
       <div class="news-spinner"></div>
-      <span style="font-size:13px;">AI가 최신 뉴스를 가져오는 중...</span>
+      <span style="font-size:13px;">최신 뉴스를 불러오는 중...</span>
     </div>`;
 
-  const today = new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'});
-
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        system: `오늘은 ${today}입니다. 당신은 크립토/블록체인 뉴스 큐레이터입니다. 반드시 JSON 배열만 반환하세요. 다른 텍스트, 설명, 마크다운 코드블록 없이 순수 JSON만 출력하세요.`,
-        messages: [{
-          role: 'user',
-          content: `오늘 가장 중요한 크립토 뉴스 7개를 웹에서 검색해서 아래 형식의 JSON 배열로만 반환하세요. 다른 텍스트는 절대 포함하지 마세요.
-
-[
-  {
-    "tag": "BTC 또는 ETH 또는 DEFI 또는 SOL 또는 규제 또는 시장 중 하나",
-    "headline": "한국어로 뉴스 제목 한 줄 요약",
-    "time": "몇 분 전 또는 몇 시간 전",
-    "source": "출처 사이트명"
-  }
-]`
-        }]
-      })
-    });
-
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-
-    /* content 블록에서 text 타입 추출 */
-    const textBlock = (data.content || []).find(b => b.type === 'text');
-    if (!textBlock) throw new Error('응답 없음');
-
-    const raw = textBlock.text.replace(/```json|```/g, '').trim();
-    const items = JSON.parse(raw);
-    if (!Array.isArray(items) || items.length === 0) throw new Error('파싱 오류');
-
+    const res = await fetch('/.netlify/functions/news');
+    if (!res.ok) throw new Error('news fetch failed');
+    const items = await res.json();
+    if (!Array.isArray(items) || !items.length) throw new Error('empty news');
     renderNews(items);
   } catch (e) {
     console.error(e);
@@ -525,6 +493,7 @@ async function loadNews() {
 
 /* 페이지 로드시 자동 실행 */
 loadNews();
+
 </script>
 
 <script>
@@ -565,7 +534,6 @@ async function loadTickerLive() {
   }
 }
 
-/* ── 중요 알림 자동 로드 ── */
 function alertClass(level) {
   if (level === 'urgent') return 'cb-alert-urgent';
   if (level === 'warn') return 'cb-alert-warn';
@@ -591,6 +559,7 @@ async function loadAlerts() {
     </div>`;
   try {
     const res = await fetch('/.netlify/functions/alerts');
+    if (!res.ok) throw new Error('alerts fetch failed');
     const items = await res.json();
     renderAlerts(items);
   } catch (e) {
@@ -598,7 +567,6 @@ async function loadAlerts() {
   }
 }
 
-/* ── 캘린더 로드 ── */
 function eventTypeClass(type) {
   if (type === 'tge') return 'tge';
   if (type === 'listing') return 'listing';
