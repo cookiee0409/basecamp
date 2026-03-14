@@ -583,31 +583,22 @@ function renderAlerts(items) {
   `).join('');
 }
 
-function renderAlertsError(msg) {
-  document.querySelector('.cb-alerts-scroll').innerHTML = `
-    <div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">${msg}</div>`;
-}
-
 async function loadAlerts() {
   document.querySelector('.cb-alerts-scroll').innerHTML = `
     <div id="alerts-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
       <div class="news-spinner"></div>
       <span style="font-size:13px;">중요 알림을 불러오는 중...</span>
     </div>`;
-
   try {
     const res = await fetch('/.netlify/functions/alerts');
-    if (!res.ok) throw new Error('alerts fetch failed');
     const items = await res.json();
-    if (!Array.isArray(items) || !items.length) throw new Error('empty');
     renderAlerts(items);
   } catch (e) {
-    console.error('alerts error', e);
-    renderAlertsError('중요 알림을 불러오지 못했습니다. 잠시 후 새로고침 해주세요.');
+    document.querySelector('.cb-alerts-scroll').innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">중요 알림을 불러오지 못했습니다.</div>';
   }
 }
 
-/* ── 동적 캘린더 렌더 ── */
+/* ── 캘린더 로드 ── */
 function eventTypeClass(type) {
   if (type === 'tge') return 'tge';
   if (type === 'listing') return 'listing';
@@ -636,18 +627,13 @@ function buildCalendarGrid(events) {
   });
 
   let cells = '';
-  for (let i = 0; i < mondayStartOffset; i++) {
-    cells += '<div class="cb-cal-day"></div>';
-  }
+  for (let i = 0; i < mondayStartOffset; i++) cells += '<div class="cb-cal-day"></div>';
   for (let day = 1; day <= lastDate; day++) {
     const today = now.getDate() === day;
     const type = eventMap.get(day);
     const classes = ['cb-cal-day'];
     if (today) classes.push('today');
-    if (type) {
-      classes.push('has-event');
-      classes.push(eventTypeClass(type));
-    }
+    if (type) { classes.push('has-event'); classes.push(eventTypeClass(type)); }
     cells += `<div class="${classes.join(' ')}">${day}</div>`;
   }
   return cells;
@@ -656,14 +642,12 @@ function buildCalendarGrid(events) {
 function renderCalendar(events) {
   const wrap = document.getElementById('calendar-wrap');
   const now = new Date();
-  const monthTitle = formatMonthTitle(now);
   const sorted = [...events].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
 
   const listHtml = sorted.map(ev => {
     const d = new Date(ev.date);
     const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
     const day = d.getDate();
-    const tag = ev.tag || 'EVENT';
     const dotColor = ev.type === 'tge' ? '#f59e0b' : ev.type === 'listing' ? '#3b82f6' : '#ef4444';
     return `
       <div class="cb-event-item">
@@ -671,15 +655,14 @@ function renderCalendar(events) {
         <div class="cb-event-dot" style="background:${dotColor}"></div>
         <div class="cb-event-info">
           <div class="cb-event-name">${ev.name}</div>
-          <div class="cb-event-tag">${tag}</div>
+          <div class="cb-event-tag">${ev.tag}</div>
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 
   wrap.innerHTML = `
     <div style="flex-shrink:0;">
-      <div style="font-size:11px;color:#94a3b8;font-family:'Space Mono',monospace;margin-bottom:8px;">${monthTitle}</div>
+      <div style="font-size:11px;color:#94a3b8;font-family:'Space Mono',monospace;margin-bottom:8px;">${formatMonthTitle(now)}</div>
       <div class="cb-cal-grid">
         <div class="cb-cal-header">M</div><div class="cb-cal-header">T</div><div class="cb-cal-header">W</div><div class="cb-cal-header">T</div><div class="cb-cal-header">F</div><div class="cb-cal-header">S</div><div class="cb-cal-header">S</div>
         ${buildCalendarGrid(sorted)}
@@ -687,30 +670,19 @@ function renderCalendar(events) {
       <div class="cb-legend">
         <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#f59e0b"></div>TGE</div>
         <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#3b82f6"></div>상장</div>
-        <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#ef4444"></div>잠금해제</div>
+        <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#ef4444"></div>기타</div>
       </div>
     </div>
-    <div class="cb-events-list">${listHtml || '<div style="color:#94a3b8;font-size:13px;">표시할 일정이 없습니다.</div>'}</div>
-  `;
+    <div class="cb-events-list">${listHtml || '<div style="color:#94a3b8;font-size:13px;">표시할 일정이 없습니다.</div>'}</div>`;
 }
 
 async function loadCalendar() {
-  const wrap = document.getElementById('calendar-wrap');
-  wrap.innerHTML = `
-    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:12px;color:#94a3b8;">
-      <div class="news-spinner"></div>
-      <span style="font-size:13px;">캘린더를 불러오는 중...</span>
-    </div>`;
-
   try {
     const res = await fetch('/.netlify/functions/calendar');
-    if (!res.ok) throw new Error('calendar fetch failed');
     const items = await res.json();
-    if (!Array.isArray(items)) throw new Error('invalid calendar data');
     renderCalendar(items);
   } catch (e) {
-    console.error('calendar error', e);
-    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">캘린더를 불러오지 못했습니다.</div>';
+    document.getElementById('calendar-wrap').innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">캘린더를 불러오지 못했습니다.</div>';
   }
 }
 

@@ -1,20 +1,4 @@
 
-function ymd(date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function startOfTodayUtc() {
-  const d = new Date();
-  return new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
-}
-
-function normalizeUnlockPayload(payload) {
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload?.data)) return payload.data;
-  if (Array.isArray(payload?.events)) return payload.events;
-  return [];
-}
-
 function fallbackEvents() {
   const today = new Date();
   const add = (days, name, tag, type) => {
@@ -23,69 +7,64 @@ function fallbackEvents() {
     return { date: d.toISOString(), name, tag, type };
   };
   return [
-    add(1, "ARB Token Unlock", "TOKEN UNLOCK · 예시 일정", "unlock"),
-    add(4, "APT Token Unlock", "TOKEN UNLOCK · 예시 일정", "unlock"),
-    add(7, "OP Token Unlock", "TOKEN UNLOCK · 예시 일정", "unlock"),
-    add(11, "SUI Token Unlock", "TOKEN UNLOCK · 예시 일정", "unlock"),
-    add(15, "STRK Token Unlock", "TOKEN UNLOCK · 예시 일정", "unlock")
+    add(1, "BTC ETF Related Event", "COINMARKETCAL · 예시 일정", "listing"),
+    add(3, "Ethereum Upgrade Watch", "COINMARKETCAL · 예시 일정", "tge"),
+    add(5, "Solana Ecosystem Event", "COINMARKETCAL · 예시 일정", "listing"),
+    add(6, "Token Unlock Watch", "COINMARKETCAL · 예시 일정", "unlock"),
+    add(7, "Exchange Listing Watch", "COINMARKETCAL · 예시 일정", "listing")
   ];
 }
 
+function normalizeType(title = "", categories = []) {
+  const s = `${title} ${(categories || []).join(" ")}`.toLowerCase();
+  if (/(listing|exchange)/.test(s)) return "listing";
+  if (/(mainnet|launch|token generation|tge)/.test(s)) return "tge";
+  return "unlock";
+}
+
 export async function handler() {
-  const apiKey = process.env.TOKENOMIST_API_KEY;
+  const apiKey = process.env.COINMARKETCAL_API_KEY;
   if (!apiKey) {
     return {
       statusCode: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
+      headers: { "content-type":"application/json; charset=utf-8" },
       body: JSON.stringify(fallbackEvents())
     };
   }
 
   try {
-    const today = startOfTodayUtc();
-    const end = new Date(today);
-    end.setUTCDate(end.getUTCDate() + 30);
-
-    const tokenListRes = await fetch("https://api.unlocks.app/v2/token/list", {
-      headers: { "x-api-key": apiKey, "accept": "application/json" }
+    const url = "https://developers.coinmarketcal.com/v1/events";
+    const params = new URLSearchParams({
+      max: "10",
+      page: "1"
     });
-    if (!tokenListRes.ok) throw new Error("token list failed");
-    const tokenListJson = await tokenListRes.json();
-    const tokenList = Array.isArray(tokenListJson?.data) ? tokenListJson.data : [];
 
-    const wanted = ["ARB", "APT", "OP", "SUI", "STRK", "SEI", "IMX", "ONDO"];
-    const selected = tokenList.filter(t => wanted.includes(String(t.symbol || "").toUpperCase())).slice(0, 8);
+    const res = await fetch(`${url}?${params.toString()}`, {
+      headers: {
+        "x-api-key": apiKey,
+        "accept": "application/json"
+      }
+    });
+    if (!res.ok) throw new Error("coinmarketcal failed");
+    const data = await res.json();
+    const items = Array.isArray(data?.body) ? data.body : (Array.isArray(data) ? data : []);
 
-    const results = await Promise.all(selected.map(async token => {
-      const url = `https://api.unlocks.app/v4/unlock/events?tokenId=${encodeURIComponent(token.id)}&start=${ymd(today)}&end=${ymd(end)}`;
-      const res = await fetch(url, {
-        headers: { "x-api-key": apiKey, "accept": "application/json" }
-      });
-      if (!res.ok) return [];
-      const json = await res.json();
-      const rows = normalizeUnlockPayload(json);
-      return rows.map(row => ({
-        date: row.unlockDate || row.date || row.timestamp,
-        name: `${row.tokenSymbol || token.symbol} Token Unlock`,
-        tag: "TOKEN UNLOCK · LIVE DATA",
-        type: "unlock"
-      }));
+    const mapped = items.slice(0, 8).map((item) => ({
+      date: item.date_event || item.created_date || new Date().toISOString(),
+      name: item.title || item.caption || "Crypto Event",
+      tag: `COINMARKETCAL · ${(item.coin?.symbol || item.category || "EVENT")}`,
+      type: normalizeType(item.title || "", Array.isArray(item.categories) ? item.categories.map(c => c.name || c) : [])
     }));
-
-    const merged = results.flat()
-      .filter(x => x.date)
-      .sort((a, b) => new Date(a.date) - new Date(b.date))
-      .slice(0, 8);
 
     return {
       statusCode: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      body: JSON.stringify(merged.length ? merged : fallbackEvents())
+      headers: { "content-type":"application/json; charset=utf-8" },
+      body: JSON.stringify(mapped.length ? mapped : fallbackEvents())
     };
   } catch (err) {
     return {
       statusCode: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
+      headers: { "content-type":"application/json; charset=utf-8" },
       body: JSON.stringify(fallbackEvents())
     };
   }
