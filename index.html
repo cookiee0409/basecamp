@@ -3,46 +3,720 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Coin Basecamp</title>
+<title>코인 베이스캠프 — Crypto Intelligence Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+KR:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-body{font-family:Arial;background:#f1f5f9;margin:0}
-.header{background:#fff;padding:16px;border-bottom:1px solid #e2e8f0;font-weight:bold}
-.section{padding:20px}
-.card{background:#fff;padding:14px;margin-bottom:10px;border-radius:8px;border:1px solid #e2e8f0}
-.ticker{display:flex;gap:20px;padding:10px;background:#fff;border-bottom:1px solid #e2e8f0}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #f1f5f9;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+/* HEADER */
+.cb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #ffffff;
+}
+.cb-logo { display: flex; align-items: center; gap: 12px; }
+.cb-logo-icon {
+  width: 40px; height: 40px;
+  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 24px; color: white;
+}
+.cb-logo-text { font-family: 'Bebas Neue', cursive; font-size: 26px; letter-spacing: 2px; color: #0f172a; }
+.cb-logo-sub { font-size: 11px; color: #94a3b8; letter-spacing: 3px; text-transform: uppercase; margin-top: 1px; }
+.cb-live-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 12px; color: #16a34a;
+  font-family: 'Space Mono', monospace;
+}
+.cb-live-dot {
+  width: 7px; height: 7px;
+  background: #16a34a; border-radius: 50%;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* NAV */
+.cb-nav {
+  display: flex; gap: 2px;
+  padding: 0 28px;
+  border-bottom: 2px solid #e2e8f0;
+  background: #ffffff;
+}
+.cb-nav-item {
+  padding: 11px 18px; font-size: 14px; color: #94a3b8;
+  cursor: pointer; border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.2s; letter-spacing: 0.3px;
+}
+.cb-nav-item:hover { color: #475569; }
+.cb-nav-item.active { color: #d97706; border-bottom-color: #d97706; font-weight: 500; }
+
+/* TICKER */
+.cb-ticker {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 9px 28px;
+  display: flex; gap: 32px; overflow-x: auto;
+  scrollbar-width: none;
+}
+.cb-ticker::-webkit-scrollbar { display: none; }
+.cb-ticker-item {
+  display: flex; align-items: center; gap: 7px;
+  white-space: nowrap;
+  font-family: 'Space Mono', monospace; font-size: 13px;
+}
+.cb-ticker-name { color: #94a3b8; font-size: 12px; }
+.cb-ticker-price { color: #0f172a; font-weight: 700; }
+.cb-ticker-up { color: #16a34a; }
+.cb-ticker-down { color: #dc2626; }
+
+/* BODY GRID */
+.cb-body {
+  display: grid;
+  grid-template-columns: 1fr 280px 480px;
+  grid-template-rows: 1fr 1fr;
+  gap: 1px;
+  background: #e2e8f0;
+  height: calc(100vh - 132px);
+  min-height: 600px;
+}
+
+.cb-panel {
+  background: #ffffff;
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.cb-panel-title {
+  font-size: 12px; font-weight: 700;
+  color: #d97706; letter-spacing: 2px;
+  text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 7px;
+}
+.cb-panel-title::before {
+  content: ''; display: inline-block;
+  width: 3px; height: 15px;
+  background: #d97706; border-radius: 2px;
+}
+
+/* NEWS */
+.cb-news-panel { grid-column: 1; grid-row: 1 / 3; }
+.cb-news-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
+.cb-news-item {
+  padding: 13px 0; border-bottom: 1px solid #f1f5f9;
+  cursor: pointer; transition: background 0.15s;
+}
+.cb-news-item:last-child { border-bottom: none; }
+.cb-news-item:hover { background: #fffbeb; margin: 0 -20px; padding: 13px 20px; }
+.cb-news-tag {
+  display: inline-block; font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  padding: 3px 7px; border-radius: 4px;
+  margin-bottom: 6px; letter-spacing: 1px; font-weight: 700;
+}
+.tag-btc { background: #fff7ed; color: #c2410c; }
+.tag-eth { background: #eff6ff; color: #1d4ed8; }
+.tag-defi { background: #f0fdf4; color: #15803d; }
+.tag-reg { background: #fef2f2; color: #b91c1c; }
+.tag-market { background: #faf5ff; color: #7c3aed; }
+.cb-news-headline { font-size: 14px; line-height: 1.6; color: #1e293b; margin-bottom: 5px; font-weight: 500; }
+.cb-news-meta { font-size: 11px; color: #94a3b8; font-family: 'Space Mono', monospace; }
+
+/* ALERTS */
+.cb-alerts-panel { grid-column: 2; grid-row: 1 / 3; }
+.cb-alerts-scroll { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: #e2e8f0 transparent; }
+.cb-alert-item {
+  padding: 12px 14px; border-radius: 8px;
+  margin-bottom: 10px; font-size: 13px;
+  line-height: 1.6; border-left: 4px solid;
+}
+.cb-alert-urgent { background: #fef2f2; border-color: #ef4444; color: #7f1d1d; }
+.cb-alert-warn { background: #fffbeb; border-color: #f59e0b; color: #78350f; }
+.cb-alert-info { background: #eff6ff; border-color: #3b82f6; color: #1e3a8a; }
+.cb-alert-success { background: #f0fdf4; border-color: #22c55e; color: #14532d; }
+.cb-alert-label { font-size: 10px; font-family: 'Space Mono', monospace; letter-spacing: 1px; margin-bottom: 5px; font-weight: 700; opacity: 0.7; }
+
+/* PROJECTS — 2 cards */
+.cb-projects-panel { grid-column: 3; grid-row: 1; }
+.cb-projects-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr);
+  gap: 14px; flex: 1;
+}
+.cb-project-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0; border-radius: 10px;
+  padding: 16px; cursor: pointer;
+  transition: all 0.2s; position: relative; overflow: hidden;
+}
+.cb-project-card:hover { border-color: #f59e0b; box-shadow: 0 4px 16px rgba(245,158,11,0.1); transform: translateY(-2px); }
+.cb-project-card::before {
+  content: ''; position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+}
+.card-a::before { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+.card-b::before { background: linear-gradient(90deg, #3b82f6, #8b5cf6); }
+.cb-project-name { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+.cb-project-type { font-size: 11px; color: #94a3b8; letter-spacing: 1px; font-family: 'Space Mono', monospace; margin-bottom: 12px; }
+.cb-project-stat { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.cb-project-stat-label { font-size: 12px; color: #64748b; }
+.cb-project-stat-val { font-size: 13px; font-family: 'Space Mono', monospace; font-weight: 700; }
+.val-gold { color: #d97706; }
+.val-blue { color: #2563eb; }
+.cb-project-airdrop {
+  margin-top: 12px; padding: 10px 12px;
+  background: #fffbeb; border-radius: 7px;
+  border: 1px solid #fde68a;
+}
+.cb-project-airdrop-title { font-size: 10px; color: #d97706; letter-spacing: 1px; font-family: 'Space Mono', monospace; margin-bottom: 8px; font-weight: 700; }
+.cb-calc-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+.cb-calc-input {
+  width: 90px; background: #ffffff;
+  border: 1px solid #e2e8f0; border-radius: 5px;
+  padding: 5px 8px; font-size: 13px;
+  font-family: 'Space Mono', monospace; color: #0f172a; outline: none;
+}
+.cb-calc-input:focus { border-color: #f59e0b; box-shadow: 0 0 0 2px rgba(245,158,11,0.15); }
+.cb-calc-label { font-size: 12px; color: #94a3b8; }
+.cb-calc-result { font-size: 15px; font-weight: 700; color: #16a34a; font-family: 'Space Mono', monospace; text-align: right; margin-top: 4px; }
+
+/* CALENDAR */
+.cb-calendar-panel { grid-column: 3; grid-row: 2; }
+.cb-cal-wrap { display: flex; gap: 20px; flex: 1; overflow: hidden; }
+.cb-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; margin-bottom: 10px; }
+.cb-cal-header { text-align: center; font-size: 10px; color: #94a3b8; font-family: 'Space Mono', monospace; padding: 2px; letter-spacing: 1px; }
+.cb-cal-day {
+  text-align: center; font-size: 11px;
+  padding: 5px 2px; border-radius: 5px;
+  color: #94a3b8; cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  transition: all 0.15s; position: relative;
+}
+.cb-cal-day:hover { background: #f1f5f9; color: #0f172a; }
+.cb-cal-day.today { background: #f59e0b; color: #fff; font-weight: 700; }
+.cb-cal-day.has-event::after {
+  content: ''; position: absolute;
+  bottom: 1px; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+}
+.cb-cal-day.has-event.tge::after { background: #f59e0b; }
+.cb-cal-day.has-event.listing::after { background: #3b82f6; }
+.cb-cal-day.has-event.unlock::after { background: #ef4444; }
+.cb-events-list { flex: 1; overflow-y: auto; scrollbar-width: none; }
+.cb-events-list::-webkit-scrollbar { display: none; }
+.cb-event-item { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 1px solid #f1f5f9; }
+.cb-event-item:last-child { border-bottom: none; }
+.cb-event-date { font-size: 10px; font-family: 'Space Mono', monospace; color: #94a3b8; min-width: 34px; text-align: center; background: #f8fafc; border-radius: 5px; padding: 4px 5px; line-height: 1.3; border: 1px solid #e2e8f0; }
+.cb-event-date span { display: block; font-size: 15px; font-weight: 700; color: #475569; }
+.cb-event-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.cb-event-info { flex: 1; }
+.cb-event-name { font-size: 13px; color: #1e293b; margin-bottom: 2px; font-weight: 500; }
+.cb-event-tag { font-size: 10px; font-family: 'Space Mono', monospace; color: #94a3b8; letter-spacing: 1px; }
+.cb-legend { display: flex; gap: 14px; margin-top: 8px; }
+.cb-legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: #64748b; font-family: 'Space Mono', monospace; }
+.cb-legend-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+/* 뉴스 로딩 스피너 */
+.news-spinner {
+  width: 28px; height: 28px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #d97706;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
 
-<div class="header">COIN BASECAMP</div>
-
-<div class="ticker" id="ticker"></div>
-
-<div class="section">
-<h3>주요 크립토 뉴스</h3>
-<div id="news"></div>
+<div class="cb-header">
+  <div class="cb-logo">
+    <div class="cb-logo-icon">C</div>
+    <div>
+      <div class="cb-logo-text">COIN BASECAMP</div>
+      <div class="cb-logo-sub">CRYPTO INTELLIGENCE HUB</div>
+    </div>
+  </div>
+  <div class="cb-live-badge">
+    <div class="cb-live-dot"></div>
+    LIVE
+  </div>
 </div>
 
-<div class="section">
-<h3>중요 알림</h3>
-<div id="alerts"></div>
+<div class="cb-nav">
+  <div class="cb-nav-item active" onclick="setNav(this)">대시보드</div>
+  <div class="cb-nav-item" onclick="setNav(this)">포트폴리오</div>
+  <div class="cb-nav-item" onclick="setNav(this)">에어드랍</div>
+  <div class="cb-nav-item" onclick="setNav(this)">TGE 캘린더</div>
+  <div class="cb-nav-item" onclick="setNav(this)">분석</div>
 </div>
 
-<div class="section">
-<h3>Pre‑TGE Radar</h3>
-<div id="tge"></div>
-</div>
+<div class="cb-ticker" id="ticker"></div>
 
-<script src="/js/news.js"></script>
-<script src="/js/alerts.js"></script>
-<script src="/js/ticker.js"></script>
-<script src="/js/tge.js"></script>
+<div class="cb-body">
+
+  <!-- NEWS (AI-powered) -->
+  <div class="cb-panel cb-news-panel">
+    <div class="cb-panel-title" style="justify-content:space-between;">
+      <span style="display:flex;align-items:center;gap:7px;">
+        <span style="display:inline-block;width:3px;height:15px;background:#d97706;border-radius:2px;flex-shrink:0;"></span>
+        주요 크립토 뉴스
+      </span>
+      <button id="news-refresh-btn" onclick="loadNews()" style="font-size:11px;font-family:'Space Mono',monospace;background:#fffbeb;border:1px solid #fde68a;color:#d97706;border-radius:6px;padding:4px 10px;cursor:pointer;white-space:nowrap;">&#8635; 새로고침</button>
+    </div>
+    <div class="cb-news-scroll" id="news-list">
+      <div id="news-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
+        <div class="news-spinner"></div>
+        <span style="font-size:13px;">AI가 최신 뉴스를 가져오는 중...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="cb-panel cb-alerts-panel">
+    <div class="cb-panel-title">중요 알림</div>
+    <div class="cb-alerts-scroll">
+      <div id="alerts-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
+        <div class="news-spinner"></div>
+        <span style="font-size:13px;">중요 알림을 불러오는 중...</span>
+      </div>
+</div>
+    </div>
+  </div>
+
+  <!-- PROJECTS 2개 -->
+  <div class="cb-panel cb-projects-panel">
+    <div class="cb-panel-title">신규 프로젝트 & 에어드랍 수익률 계산기</div>
+    <div class="cb-projects-grid">
+
+      <div class="cb-project-card card-a">
+        <div class="cb-project-name">NEXUS</div>
+        <div class="cb-project-type">L2 · ZK ROLLUP</div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">펀딩</span><span class="cb-project-stat-val val-gold">$48M</span></div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">TGE</span><span class="cb-project-stat-val val-gold">2025 Q2</span></div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">참여 난도</span><span class="cb-project-stat-val" style="color:#dc2626">HIGH</span></div>
+        <div class="cb-project-airdrop">
+          <div class="cb-project-airdrop-title">에어드랍 계산기</div>
+          <div class="cb-calc-row">
+            <input class="cb-calc-input" type="number" id="nexus-inv" value="100" oninput="calcAirdrop('nexus',3.4)">
+            <span class="cb-calc-label">USD 투입</span>
+          </div>
+          <div class="cb-calc-result" id="nexus-res">예상 $340</div>
+        </div>
+      </div>
+
+      <div class="cb-project-card card-b">
+        <div class="cb-project-name">MANTA V2</div>
+        <div class="cb-project-type">MODULAR · DA</div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">펀딩</span><span class="cb-project-stat-val val-blue">$65M</span></div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">TGE</span><span class="cb-project-stat-val val-blue">2025 Q3</span></div>
+        <div class="cb-project-stat"><span class="cb-project-stat-label">참여 난도</span><span class="cb-project-stat-val" style="color:#d97706">MED</span></div>
+        <div class="cb-project-airdrop">
+          <div class="cb-project-airdrop-title">에어드랍 계산기</div>
+          <div class="cb-calc-row">
+            <input class="cb-calc-input" type="number" id="manta-inv" value="100" oninput="calcAirdrop('manta',5.1)">
+            <span class="cb-calc-label">USD 투입</span>
+          </div>
+          <div class="cb-calc-result" id="manta-res">예상 $510</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="cb-panel cb-calendar-panel">
+    <div class="cb-panel-title">TGE 캘린더 · 크립토 주요 일정</div>
+    <div class="cb-cal-wrap" id="calendar-wrap">
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:12px;color:#94a3b8;">
+        <div class="news-spinner"></div>
+        <span style="font-size:13px;">캘린더를 불러오는 중...</span>
+      </div>
+    </div></div>
+        </div>
+      </div>
+      <div class="cb-events-list">
+        <div class="cb-event-item">
+          <div class="cb-event-date">MAR<span>14</span></div>
+          <div class="cb-event-dot" style="background:#f59e0b"></div>
+          <div class="cb-event-info">
+            <div class="cb-event-name">EigenLayer EIGEN 2차 에어드랍 클레임</div>
+            <div class="cb-event-tag">TGE · 마감 오늘</div>
+          </div>
+        </div>
+        <div class="cb-event-item">
+          <div class="cb-event-date">MAR<span>15</span></div>
+          <div class="cb-event-dot" style="background:#ef4444"></div>
+          <div class="cb-event-info">
+            <div class="cb-event-name">ARB 투자자 베스팅 잠금 해제 $340M</div>
+            <div class="cb-event-tag">TOKEN UNLOCK · HIGH IMPACT</div>
+          </div>
+        </div>
+        <div class="cb-event-item">
+          <div class="cb-event-date">MAR<span>19</span></div>
+          <div class="cb-event-dot" style="background:#f59e0b"></div>
+          <div class="cb-event-info">
+            <div class="cb-event-name">Nexus Network 메인넷 TGE</div>
+            <div class="cb-event-tag">TGE · L2</div>
+          </div>
+        </div>
+        <div class="cb-event-item">
+          <div class="cb-event-date">MAR<span>21</span></div>
+          <div class="cb-event-dot" style="background:#3b82f6"></div>
+          <div class="cb-event-info">
+            <div class="cb-event-name">Berachain BERA Binance 상장</div>
+            <div class="cb-event-tag">LISTING · TIER 1 CEX</div>
+          </div>
+        </div>
+        <div class="cb-event-item">
+          <div class="cb-event-date">MAR<span>28</span></div>
+          <div class="cb-event-dot" style="background:#f59e0b"></div>
+          <div class="cb-event-info">
+            <div class="cb-event-name">Eclipse SVM L2 퍼블릭 TGE</div>
+            <div class="cb-event-tag">TGE · SVM</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 <script>
-loadNews()
-loadAlerts()
-loadTicker()
-loadTGE()
+/* ── 티커 ── */
+const tickers = [
+  { name:'BTC', price:'$83,421', change:'+2.4%', up:true },
+  { name:'ETH', price:'$1,874',  change:'-0.8%', up:false },
+  { name:'SOL', price:'$126.3',  change:'+5.1%', up:true },
+  { name:'BNB', price:'$594.2',  change:'-1.2%', up:false },
+  { name:'AVAX',price:'$22.4',   change:'+3.7%', up:true },
+  { name:'SUI', price:'$2.87',   change:'+8.3%', up:true },
+  { name:'MATIC',price:'$0.52',  change:'-2.1%', up:false },
+  { name:'DOT', price:'$4.81',   change:'+1.6%', up:true },
+];
+const tickerEl = document.getElementById('ticker');
+tickers.forEach(t => {
+  tickerEl.innerHTML += `<div class="cb-ticker-item">
+    <span class="cb-ticker-name">${t.name}</span>
+    <span class="cb-ticker-price">${t.price}</span>
+    <span class="${t.up?'cb-ticker-up':'cb-ticker-down'}">${t.change}</span>
+  </div>`;
+});
+
+/* ── 내비게이션 ── */
+function setNav(el) {
+  document.querySelectorAll('.cb-nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── 에어드랍 계산기 ── */
+function calcAirdrop(project, rate) {
+  const inv = parseFloat(document.getElementById(project+'-inv').value) || 0;
+  const est = Math.round(inv * rate);
+  document.getElementById(project+'-res').textContent = '예상 $' + est.toLocaleString();
+}
+
+/* ── AI 뉴스 자동 로드 ── */
+const TAG_MAP = {
+  BTC:'tag-btc', ETH:'tag-eth', DEFI:'tag-defi',
+  SOL:'tag-defi', REGULATION:'tag-reg', 규제:'tag-reg',
+  MARKET:'tag-market', 시장:'tag-market', ALTCOIN:'tag-market'
+};
+
+function tagClass(tag) {
+  const key = (tag||'').toUpperCase();
+  for (const k of Object.keys(TAG_MAP)) {
+    if (key.includes(k)) return TAG_MAP[k];
+  }
+  return 'tag-market';
+}
+
+function renderNews(items) {
+  const list = document.getElementById('news-list');
+  list.innerHTML = items.map(item => `
+    <div class="cb-news-item">
+      <div><span class="cb-news-tag ${tagClass(item.tag)}">${item.tag}</span></div>
+      <div class="cb-news-headline">${item.headline}</div>
+      <div class="cb-news-meta">${item.time} · ${item.source}</div>
+    </div>
+  `).join('');
+}
+
+function renderError(msg) {
+  document.getElementById('news-list').innerHTML = `
+    <div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">${msg}</div>`;
+}
+
+async function loadNews() {
+  const btn = document.getElementById('news-refresh-btn');
+  btn.disabled = true;
+  btn.textContent = '로딩 중...';
+
+  document.getElementById('news-list').innerHTML = `
+    <div id="news-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
+      <div class="news-spinner"></div>
+      <span style="font-size:13px;">AI가 최신 뉴스를 가져오는 중...</span>
+    </div>`;
+
+  const today = new Date().toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'});
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: `오늘은 ${today}입니다. 당신은 크립토/블록체인 뉴스 큐레이터입니다. 반드시 JSON 배열만 반환하세요. 다른 텍스트, 설명, 마크다운 코드블록 없이 순수 JSON만 출력하세요.`,
+        messages: [{
+          role: 'user',
+          content: `오늘 가장 중요한 크립토 뉴스 7개를 웹에서 검색해서 아래 형식의 JSON 배열로만 반환하세요. 다른 텍스트는 절대 포함하지 마세요.
+
+[
+  {
+    "tag": "BTC 또는 ETH 또는 DEFI 또는 SOL 또는 규제 또는 시장 중 하나",
+    "headline": "한국어로 뉴스 제목 한 줄 요약",
+    "time": "몇 분 전 또는 몇 시간 전",
+    "source": "출처 사이트명"
+  }
+]`
+        }]
+      })
+    });
+
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+
+    /* content 블록에서 text 타입 추출 */
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    if (!textBlock) throw new Error('응답 없음');
+
+    const raw = textBlock.text.replace(/```json|```/g, '').trim();
+    const items = JSON.parse(raw);
+    if (!Array.isArray(items) || items.length === 0) throw new Error('파싱 오류');
+
+    renderNews(items);
+  } catch (e) {
+    console.error(e);
+    renderError('뉴스를 불러오지 못했습니다. 잠시 후 새로고침 버튼을 눌러주세요.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '&#8635; 새로고침';
+  }
+}
+
+/* 페이지 로드시 자동 실행 */
+loadNews();
+</script>
+
+<script>
+/* ── 실시간 티커 로드 ── */
+async function loadTickerLive() {
+  try {
+    const res = await fetch('/.netlify/functions/ticker');
+    if (!res.ok) throw new Error('ticker fetch failed');
+    const data = await res.json();
+
+    const map = [
+      ['BTC', 'bitcoin'],
+      ['ETH', 'ethereum'],
+      ['SOL', 'solana'],
+      ['BNB', 'binancecoin'],
+      ['AVAX', 'avalanche-2'],
+      ['SUI', 'sui'],
+      ['DOT', 'polkadot'],
+      ['MATIC', 'matic-network']
+    ];
+
+    tickerEl.innerHTML = map.map(([label, key]) => {
+      const item = data[key];
+      if (!item) return '';
+      const price = typeof item.usd === 'number'
+        ? '$' + item.usd.toLocaleString(undefined, { maximumFractionDigits: item.usd >= 100 ? 0 : 2 })
+        : '-';
+      const ch = typeof item.usd_24h_change === 'number' ? item.usd_24h_change : 0;
+      const sign = ch >= 0 ? '+' : '';
+      return `<div class="cb-ticker-item">
+        <span class="cb-ticker-name">${label}</span>
+        <span class="cb-ticker-price">${price}</span>
+        <span class="${ch >= 0 ? 'cb-ticker-up' : 'cb-ticker-down'}">${sign}${ch.toFixed(1)}%</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    console.error('ticker error', e);
+  }
+}
+
+/* ── 중요 알림 자동 로드 ── */
+function alertClass(level) {
+  if (level === 'urgent') return 'cb-alert-urgent';
+  if (level === 'warn') return 'cb-alert-warn';
+  if (level === 'success') return 'cb-alert-success';
+  return 'cb-alert-info';
+}
+
+function renderAlerts(items) {
+  const wrap = document.querySelector('.cb-alerts-scroll');
+  wrap.innerHTML = items.map(item => `
+    <div class="cb-alert-item ${alertClass(item.level)}">
+      <div class="cb-alert-label">${item.label}</div>
+      ${item.text}
+    </div>
+  `).join('');
+}
+
+function renderAlertsError(msg) {
+  document.querySelector('.cb-alerts-scroll').innerHTML = `
+    <div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">${msg}</div>`;
+}
+
+async function loadAlerts() {
+  document.querySelector('.cb-alerts-scroll').innerHTML = `
+    <div id="alerts-loading" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:#94a3b8;">
+      <div class="news-spinner"></div>
+      <span style="font-size:13px;">중요 알림을 불러오는 중...</span>
+    </div>`;
+
+  try {
+    const res = await fetch('/.netlify/functions/alerts');
+    if (!res.ok) throw new Error('alerts fetch failed');
+    const items = await res.json();
+    if (!Array.isArray(items) || !items.length) throw new Error('empty');
+    renderAlerts(items);
+  } catch (e) {
+    console.error('alerts error', e);
+    renderAlertsError('중요 알림을 불러오지 못했습니다. 잠시 후 새로고침 해주세요.');
+  }
+}
+
+/* ── 동적 캘린더 렌더 ── */
+function eventTypeClass(type) {
+  if (type === 'tge') return 'tge';
+  if (type === 'listing') return 'listing';
+  return 'unlock';
+}
+
+function formatMonthTitle(d) {
+  return `${d.getFullYear()} · ${d.toLocaleString('en-US', { month: 'short' }).toUpperCase()}`;
+}
+
+function buildCalendarGrid(events) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const first = new Date(year, month, 1);
+  const lastDate = new Date(year, month + 1, 0).getDate();
+  const mondayStartOffset = (first.getDay() + 6) % 7;
+  const eventMap = new Map();
+
+  events.forEach(ev => {
+    const d = new Date(ev.date);
+    if (d.getFullYear() === year && d.getMonth() === month) {
+      const day = d.getDate();
+      if (!eventMap.has(day)) eventMap.set(day, ev.type || 'unlock');
+    }
+  });
+
+  let cells = '';
+  for (let i = 0; i < mondayStartOffset; i++) {
+    cells += '<div class="cb-cal-day"></div>';
+  }
+  for (let day = 1; day <= lastDate; day++) {
+    const today = now.getDate() === day;
+    const type = eventMap.get(day);
+    const classes = ['cb-cal-day'];
+    if (today) classes.push('today');
+    if (type) {
+      classes.push('has-event');
+      classes.push(eventTypeClass(type));
+    }
+    cells += `<div class="${classes.join(' ')}">${day}</div>`;
+  }
+  return cells;
+}
+
+function renderCalendar(events) {
+  const wrap = document.getElementById('calendar-wrap');
+  const now = new Date();
+  const monthTitle = formatMonthTitle(now);
+  const sorted = [...events].sort((a,b) => new Date(a.date) - new Date(b.date)).slice(0, 6);
+
+  const listHtml = sorted.map(ev => {
+    const d = new Date(ev.date);
+    const month = d.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+    const day = d.getDate();
+    const tag = ev.tag || 'EVENT';
+    const dotColor = ev.type === 'tge' ? '#f59e0b' : ev.type === 'listing' ? '#3b82f6' : '#ef4444';
+    return `
+      <div class="cb-event-item">
+        <div class="cb-event-date">${month}<span>${day}</span></div>
+        <div class="cb-event-dot" style="background:${dotColor}"></div>
+        <div class="cb-event-info">
+          <div class="cb-event-name">${ev.name}</div>
+          <div class="cb-event-tag">${tag}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  wrap.innerHTML = `
+    <div style="flex-shrink:0;">
+      <div style="font-size:11px;color:#94a3b8;font-family:'Space Mono',monospace;margin-bottom:8px;">${monthTitle}</div>
+      <div class="cb-cal-grid">
+        <div class="cb-cal-header">M</div><div class="cb-cal-header">T</div><div class="cb-cal-header">W</div><div class="cb-cal-header">T</div><div class="cb-cal-header">F</div><div class="cb-cal-header">S</div><div class="cb-cal-header">S</div>
+        ${buildCalendarGrid(sorted)}
+      </div>
+      <div class="cb-legend">
+        <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#f59e0b"></div>TGE</div>
+        <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#3b82f6"></div>상장</div>
+        <div class="cb-legend-item"><div class="cb-legend-dot" style="background:#ef4444"></div>잠금해제</div>
+      </div>
+    </div>
+    <div class="cb-events-list">${listHtml || '<div style="color:#94a3b8;font-size:13px;">표시할 일정이 없습니다.</div>'}</div>
+  `;
+}
+
+async function loadCalendar() {
+  const wrap = document.getElementById('calendar-wrap');
+  wrap.innerHTML = `
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;width:100%;gap:12px;color:#94a3b8;">
+      <div class="news-spinner"></div>
+      <span style="font-size:13px;">캘린더를 불러오는 중...</span>
+    </div>`;
+
+  try {
+    const res = await fetch('/.netlify/functions/calendar');
+    if (!res.ok) throw new Error('calendar fetch failed');
+    const items = await res.json();
+    if (!Array.isArray(items)) throw new Error('invalid calendar data');
+    renderCalendar(items);
+  } catch (e) {
+    console.error('calendar error', e);
+    wrap.innerHTML = '<div style="padding:20px;text-align:center;color:#ef4444;font-size:13px;">캘린더를 불러오지 못했습니다.</div>';
+  }
+}
+
+loadTickerLive();
+loadAlerts();
+loadCalendar();
 </script>
 
 </body>
