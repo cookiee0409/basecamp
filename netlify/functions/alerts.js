@@ -39,8 +39,16 @@ export async function handler() {
       .sort((a,b) => new Date(b.item.pubDate) - new Date(a.item.pubDate))
       .slice(0, 6)
       .map(({ item, meta }) => ({ level: meta.level, label: meta.label, text: buildText(item), url: item.link || "#" }));
-    return { statusCode: 200, headers: { "content-type": "application/json; charset=utf-8" }, body: JSON.stringify(alerts.length ? alerts : [{ level:"info", label:"📋 안내", text:"현재 조건에 맞는 중요 알림이 없습니다.", url:"#"}]) };
+    return {
+      statusCode: 200,
+      headers: { "content-type":"application/json; charset=utf-8" },
+      body: JSON.stringify(alerts.length ? alerts : [{ level:"info", label:"📋 안내", text:"현재 조건에 맞는 중요 알림이 없습니다.", url:"#"}])
+    };
   } catch (err) {
-    return { statusCode: 200, headers: { "content-type": "application/json; charset=utf-8" }, body: JSON.stringify([{ level:"info", label:"📋 안내", text:"중요 알림 데이터를 불러오지 못했습니다.", url:"#"}]) };
+    return {
+      statusCode: 200,
+      headers: { "content-type":"application/json; charset=utf-8" },
+      body: JSON.stringify([{ level:"info", label:"📋 안내", text:"중요 알림 데이터를 불러오지 못했습니다.", url:"#"}])
+    };
   }
 }

@@ -4,7 +4,7 @@ function fallbackEvents() {
   const add = (days, name, tag, type) => {
     const d = new Date(today);
     d.setDate(d.getDate() + days);
-    return { date: d.toISOString(), name, tag, type };
+    return { date: d.toISOString(), name, tag, type, url: "#" };
   };
   return [
     add(1, "BTC ETF Related Event", "COINMARKETCAL · 예시 일정", "listing"),
@@ -14,14 +14,12 @@ function fallbackEvents() {
     add(7, "Exchange Listing Watch", "COINMARKETCAL · 예시 일정", "listing")
   ];
 }
-
 function normalizeType(title = "", categories = []) {
   const s = `${title} ${(categories || []).join(" ")}`.toLowerCase();
   if (/(listing|exchange)/.test(s)) return "listing";
   if (/(mainnet|launch|token generation|tge)/.test(s)) return "tge";
   return "unlock";
 }
-
 export async function handler() {
   const apiKey = process.env.COINMARKETCAL_API_KEY;
   if (!apiKey) {
@@ -34,16 +32,9 @@ export async function handler() {
 
   try {
     const url = "https://developers.coinmarketcal.com/v1/events";
-    const params = new URLSearchParams({
-      max: "10",
-      page: "1"
-    });
-
+    const params = new URLSearchParams({ max: "10", page: "1" });
     const res = await fetch(`${url}?${params.toString()}`, {
-      headers: {
-        "x-api-key": apiKey,
-        "accept": "application/json"
-      }
+      headers: { "x-api-key": apiKey, "accept": "application/json" }
     });
     if (!res.ok) throw new Error("coinmarketcal failed");
     const data = await res.json();
@@ -53,7 +44,8 @@ export async function handler() {
       date: item.date_event || item.created_date || new Date().toISOString(),
       name: item.title || item.caption || "Crypto Event",
       tag: `COINMARKETCAL · ${(item.coin?.symbol || item.category || "EVENT")}`,
-      type: normalizeType(item.title || "", Array.isArray(item.categories) ? item.categories.map(c => c.name || c) : [])
+      type: normalizeType(item.title || "", Array.isArray(item.categories) ? item.categories.map(c => c.name || c) : []),
+      url: item.proof || item.source || "#"
     }));
 
     return {
